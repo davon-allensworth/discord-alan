@@ -1,2 +1,3 @@
-# discord-alan
-"We can only see a short distance ahead, but we can see plenty there that needs to be done." - Alan Turing
+# Alan
+
+Inspired by the famous English Mathematician Alan Turing, Alan is a Discord bot that brings... something to a server.
