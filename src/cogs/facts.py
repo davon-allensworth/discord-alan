@@ -24,8 +24,8 @@ else:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
 
-def setup(bot):
-    bot.add_cog(Facts(bot))
+async def setup(bot):
+    await bot.add_cog(Facts(bot))
 
 
 class Facts(commands.Cog, name="facts"):

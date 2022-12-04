@@ -1,14 +1,16 @@
 # Alan
+import asyncio
+import json
 import os
-import yaml
-import sys
 import platform
 import random
+import sys
+import yaml
 import discord
 from discord.activity import Activity
 from discord.enums import ActivityType
 from discord.ext import commands, tasks
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, Context
 
 ACTIVITIES = [(ActivityType.listening, 'Jim Synonym'),
               (ActivityType.listening, 'Nobody\'s Anomaly.'),
@@ -27,19 +29,23 @@ else:
     with open("config.yaml") as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 
 bot = Bot(command_prefix=config["bot_prefix"], intents=intents)
 
 # Executes when bot is ready to begin processing commands
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
+    """
+    The code in this even is executed when the bot is ready
+    """
     print(f"Logged in as {bot.user.name}")
-    print(f"Discord.py API version: {discord.__version__}")
+    print(f"discord.py API version: {discord.__version__}")
     print(f"Python version: {platform.python_version()}")
     print(f"Running on: {platform.system()} {platform.release()} ({os.name})")
     print("-------------------")
     status_task.start()
+    await bot.tree.sync()
 
 
 # Setup the game status task of the bot
@@ -53,12 +59,12 @@ async def status_task():
 # Removes the default help command of discord.py to be able to create our custom help command.
 bot.remove_command("help")
 
-if __name__ == "__main__":
+async def load_cogs() -> None:
     for file in os.listdir("./cogs"):
         if file.endswith(".py"):
             extension = file[:-3]
             try:
-                bot.load_extension(f"cogs.{extension}")
+                await bot.load_extension(f"cogs.{extension}")
                 print(f"Loaded extension '{extension}'")
             except Exception as e:
                 exception = f"{type(e).__name__}: {e}"
@@ -110,4 +116,5 @@ async def on_command_error(context, error):
 
 
 # Run the bot with the token
+asyncio.run(load_cogs())
 bot.run(config["token"])
