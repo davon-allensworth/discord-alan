@@ -3,10 +3,12 @@ import asyncio
 import json
 import os
 import platform
+import pytz
 import random
 import sys
 import yaml
 import discord
+from datetime import datetime
 from discord.activity import Activity
 from discord.enums import ActivityType
 from discord.ext import commands, tasks
@@ -45,6 +47,7 @@ async def on_ready() -> None:
     print(f"Running on: {platform.system()} {platform.release()} ({os.name})")
     print("-------------------")
     status_task.start()
+    send_good_morning.start()
     await bot.tree.sync()
 
 
@@ -54,6 +57,24 @@ async def status_task():
     rand = random.choice(ACTIVITIES)
     new_activity = Activity(type=rand[0], name=rand[1])
     await bot.change_presence(activity=new_activity)
+
+# GOOD MORNING
+est = pytz.timezone('US/Eastern')
+
+# send "Good Morning!" every weekday at 5:00 am EST
+@tasks.loop()
+async def send_good_morning():
+    while True:
+        # get current time in EST
+        current_time = datetime.now(est)
+        # send message on weekdays at 5:00 am EST
+        if current_time.weekday() < 5 and current_time.hour == 5 and current_time.minute == 00:
+            # send message to the default channel
+            for gm_channel in config['gm_channels']:
+                channel = bot.get_channel(gm_channel)
+                await channel.send("Rise and Grind Gamers :)")
+        # wait for 1 minute before checking time again
+        await asyncio.sleep(60)
 
 
 # Removes the default help command of discord.py to be able to create our custom help command.
