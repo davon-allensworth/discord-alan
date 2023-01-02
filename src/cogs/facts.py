@@ -45,4 +45,4 @@ class Facts(commands.Cog, name="facts"):
         if len(FACTS) == 0:
             await context.send("Someone tell Dev to add more facts about Alan.")
         else:
-            await context.send("Hello everyone! \nDid you know that " + random.choice(FACTS))
+            await context.send("Alan Fact: \n" + random.choice(FACTS))
