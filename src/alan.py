@@ -25,6 +25,15 @@ ACTIVITIES = [(ActivityType.listening, 'Jim Synonym'),
               (ActivityType.watching, 'Barnyard: The Movie.'),
               ]
 
+MORNING_SAYINGS = ["Rise and Grind Gamers",
+                    "Obtain the Grain",
+                    "Lets get this bread",
+                    "Good Morning!",
+                    "Ohayou gozaimasu",
+                    "Buenos días",
+                    "Wakey wakey it's time for skoo",
+                    "Top of the morning"]
+
 if not os.path.isfile("config.yaml"):
     sys.exit("'config.yaml' not found!")
 else:
@@ -72,7 +81,7 @@ async def send_good_morning():
             # send message to the default channel
             for gm_channel in config['gm_channels']:
                 channel = bot.get_channel(gm_channel)
-                await channel.send("Rise and Grind Gamers :)")
+                await channel.send(random.choice(MORNING_SAYINGS) + " :)")
         # wait for 1 minute before checking time again
         await asyncio.sleep(60)
 
