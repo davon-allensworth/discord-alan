@@ -8,7 +8,8 @@ import random
 import sys
 import yaml
 import discord
-from datetime import datetime
+import datetime
+from datetime import date, timedelta
 from discord.activity import Activity
 from discord.enums import ActivityType
 from discord.ext import commands, tasks
@@ -68,22 +69,20 @@ async def status_task():
     await bot.change_presence(activity=new_activity)
 
 # GOOD MORNING
-est = pytz.timezone('US/Eastern')
+time = datetime.time(hour=5, minute=00, second=1)
 
-# send "Good Morning!" every weekday at 5:00 am EST
-@tasks.loop()
+@tasks.loop(minutes=1)
 async def send_good_morning():
-    while True:
-        # get current time in EST
-        current_time = datetime.now(est)
-        # send message on weekdays at 5:00 am EST
-        if current_time.weekday() < 5 and current_time.hour == 5 and current_time.minute == 00:
-            # send message to the default channel
-            for gm_channel in config['gm_channels']:
-                channel = bot.get_channel(gm_channel)
-                await channel.send(random.choice(MORNING_SAYINGS) + " :)")
-        # wait for 1 minute before checking time again
-        await asyncio.sleep(60)
+    for gm_channel in config['gm_channels']:
+        channel = bot.get_channel(gm_channel)
+        await channel.send(random.choice(MORNING_SAYINGS) + " :)")
+
+@send_good_morning.before_loop
+async def before():
+    now = datetime.datetime.now()
+    future = datetime.datetime.combine(date.today() + timedelta(1), time)
+    delta = abs((future - now).total_seconds())
+    await asyncio.sleep(delta)
 
 
 # Removes the default help command of discord.py to be able to create our custom help command.
@@ -107,8 +106,8 @@ async def on_message(message):
     # Ignores if a command is being executed by a bot or by the bot itself
     if message.author == bot.user or message.author.bot:
         return
-    # Ignores if a command is being executed by a blacklisted user
 
+    # Ignores if a command is being executed by a blacklisted user
     if message.author.id in config["blacklist"]:
         return
     await bot.process_commands(message)
