@@ -71,7 +71,7 @@ async def status_task():
 # GOOD MORNING
 time = datetime.time(hour=5, minute=00, second=1)
 
-@tasks.loop(minutes=1)
+@tasks.loop(minutes=1440)
 async def send_good_morning():
     for gm_channel in config['gm_channels']:
         channel = bot.get_channel(gm_channel)
@@ -80,10 +80,12 @@ async def send_good_morning():
 @send_good_morning.before_loop
 async def before():
     now = datetime.datetime.now()
-    future = datetime.datetime.combine(date.today() + timedelta(1), time)
+    if now.time() > datetime.time(00,00) and now.time() < datetime.time(5,00):
+        future = datetime.datetime.combine(date.today(), time)
+    else:
+        future = datetime.datetime.combine(date.today() + timedelta(1), time)
     delta = abs((future - now).total_seconds())
     await asyncio.sleep(delta)
-
 
 # Removes the default help command of discord.py to be able to create our custom help command.
 bot.remove_command("help")
