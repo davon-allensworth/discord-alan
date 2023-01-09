@@ -69,13 +69,17 @@ async def status_task():
     await bot.change_presence(activity=new_activity)
 
 # GOOD MORNING
-time = datetime.time(hour=5, minute=00, second=1)
+time = datetime.time(hour=5, minute=00, second=10)
 
 @tasks.loop(minutes=1440)
 async def send_good_morning():
-    for gm_channel in config['gm_channels']:
-        channel = bot.get_channel(gm_channel)
-        await channel.send(random.choice(MORNING_SAYINGS) + " :)")
+    day = datetime.datetime.now()
+ 
+    if day.weekday() < 6:
+        for gm_channel in config['gm_channels']:
+            channel = bot.get_channel(gm_channel)
+            await channel.send(random.choice(MORNING_SAYINGS))
+            await channel.send("Happy ", day.strftime('%A'), " :)")
 
 @send_good_morning.before_loop
 async def before():
