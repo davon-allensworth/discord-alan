@@ -26,6 +26,8 @@ class Help(commands.Cog, name="help"):
             prefix = prefix[0]
         embed = discord.Embed(title="Help", description="List of available commands:", color=config["success"])
         for i in self.bot.cogs:
+            if i == "send":
+                continue
             cog = self.bot.get_cog(i.lower())
             commands = cog.get_commands()
             command_list = [command.name for command in commands]

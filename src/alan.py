@@ -121,6 +121,8 @@ async def on_command_completion(ctx):
     fullCommandName = ctx.command.qualified_name
     split = fullCommandName.split(" ")
     executedCommand = str(split[0])
+    if ctx.channel.type is discord.ChannelType.private:
+        return
     print(
         f"Executed {executedCommand} command in {ctx.guild.name} (ID: {ctx.message.guild.id}) by {ctx.message.author} (ID: {ctx.message.author.id})")
 
